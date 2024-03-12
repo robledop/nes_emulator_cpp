@@ -264,9 +264,31 @@ uint16_t PPU::get_background_palette(uint16_t attribute) {
 	default: assert(false);
   }
 }
-uint16_t PPU::get_rgb_color(uint8_t *r, uint8_t *g, uint8_t *b, uint16_t index) {
+void PPU::get_rgb_color(uint8_t *r, uint8_t *g, uint8_t *b, uint16_t index) {
   const uint32_t colors = ppu_colors[index];
   *r = (colors >> 16) & 0xff;
   *g = (colors >> 8) & 0xFF;
   *b = colors & 0xFF;
+}
+
+void PPU::clear_memory() {
+  memset(this->memory.data, 0, VRAM_SIZE);
+  memset(this->oam.data, 0, OAM_SIZE);
+
+  this->ppu_data_addr = 0x00;
+  this->ppu_latch = false;
+  this->ppu_latch = false;
+}
+void PPU::clear_registers() {
+  this->registers.oam_addr = 0x00;
+  this->registers.oam_data = 0x00;
+  this->registers.oam_dma = 0x00;
+  this->registers.ppu_addr = 0x00;
+  this->registers.ppu_ctrl = 0x00;
+  this->registers.ppu_data = 0x00;
+  this->registers.ppu_mask = 0x00;
+  this->registers.ppu_scroll_x = 0x00;
+  this->registers.ppu_scroll_y = 0x00;
+  this->registers.ppu_status = 0x00;
+
 }

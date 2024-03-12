@@ -126,6 +126,32 @@ class CPU {
   void inx();
   void iny();
   void jmp(AddressMode address_mode);
+  void jsr();
+  void lsr(AddressMode address_mode);
+  static void nop();
+  void ora(AddressMode address_mode);
+  void pha();
+  void php();
+  void pla();
+  void plp();
+  void rol(AddressMode address_mode);
+  void ror(AddressMode address_mode);
+  void rti();
+  void rts();
+  void sbc(AddressMode address_mode);
+  void sec();
+  void sed();
+  void sei();
+  void sta(AddressMode address_mode);
+  void stx(AddressMode address_mode);
+  void sty(AddressMode address_mode);
+  void tax();
+  void tay();
+  void tsx();
+  void txa();
+  void txs();
+  void tya();
+  void bcs();
 
  public:
   // Program counter
@@ -139,19 +165,19 @@ class CPU {
   uint8_t read_memory(uint16_t address);
   void write_memory(uint16_t address, uint8_t value);
 
-  bool get_c_flag();
+  [[nodiscard]] bool get_c_flag() const;
   void set_c_flag(uint8_t value);
-  bool get_z_flag();
+  [[nodiscard]] bool get_z_flag() const;
   void set_z_flag(uint8_t value);
-  bool get_i_flag();
+  [[nodiscard]] bool get_i_flag() const;
   void set_i_flag(int8_t value);
-  bool get_d_flag();
+  [[nodiscard]] bool get_d_flag() const;
   void set_d_flag(int8_t value);
-  bool get_b_flag();
+  [[nodiscard]] bool get_b_flag() const;
   void set_b_flag(int8_t value);
-  bool get_v_flag();
+  [[nodiscard]] bool get_v_flag() const;
   void set_v_flag(int8_t value);
-  bool get_n_flag();
+  [[nodiscard]] bool get_n_flag() const;
   void set_n_flag(int8_t value);
 
   void call_nmi();

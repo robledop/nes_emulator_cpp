@@ -97,7 +97,7 @@ class PPU {
 						uint16_t palette_base);
   uint16_t  get_sprite_palette(uint8_t attribute);
   uint16_t get_background_palette(uint16_t attribute);
-  uint16_t  get_rgb_color(uint8_t *r, uint8_t *g, uint8_t *b, uint16_t color);
+  void  get_rgb_color(uint8_t *r, uint8_t *g, uint8_t *b, uint16_t color);
 
  public:
   VRAM memory;
@@ -111,6 +111,8 @@ class PPU {
 
   void render_background(SDL_Renderer *renderer);
   void render_sprites(SDL_Renderer *renderer);
+  void clear_memory();
+  void clear_registers();
 
   constexpr static const uint32_t ppu_colors[64] =
 	  {

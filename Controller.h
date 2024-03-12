@@ -11,7 +11,7 @@ class Controller {
   void init();
   uint8_t read_next_button();
   void handle_input(const SDL_Event *event);
-  void write(const uint8_t value);
+  void write(uint8_t value);
 };
 
 #endif //NES_EMULATOR_CPP_CONTROLLER_H_

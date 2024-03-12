@@ -1,7 +1,6 @@
 #include <iostream>
 #include "SDL2/SDL.h"
 #include "NES.h"
-#include <memory.h>
 
 void print_header_info(const char *rom, uint16_t *prg_size_out, uint16_t *chr_size_out) {
   printf("%s:", "Header");
