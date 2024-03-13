@@ -61,32 +61,6 @@ struct Memory {
 };
 
 class CPU {
-  uint16_t nmi_prt;
-  uint16_t irq_prt;
-
-  // Accumulator
-  uint8_t a;
-
-  // Index register
-  uint8_t x, y;
-
-  // Stack pointer
-  uint8_t sp;
-
-  // Processor status
-  // N, V, 1, B, D, I, Z, C
-  // N = Negative
-  // V = Overflow
-  // 1 = Unused
-  // B = BRK command 1 = BRK, 0 = IRQB
-  // D = decimal mode
-  // I = IRQB disable
-  // Z = Zero
-  // C = Carry
-  uint8_t p;
-
-
-
   void calc_carry(uint16_t value);
   void calc_zero(uint8_t value);
   void calc_negative(uint8_t value);
@@ -154,6 +128,29 @@ class CPU {
   void bcs();
 
  public:
+  uint16_t nmi_prt;
+  uint16_t irq_prt;
+
+  // Accumulator
+  uint8_t a;
+
+  // Index register
+  uint8_t x, y;
+
+  // Stack pointer
+  uint8_t sp;
+
+  // Processor status
+  // N, V, 1, B, D, I, Z, C
+  // N = Negative
+  // V = Overflow
+  // 1 = Unused
+  // B = BRK command 1 = BRK, 0 = IRQB
+  // D = decimal mode
+  // I = IRQB disable
+  // Z = Zero
+  // C = Carry
+  uint8_t p;
   // Program counter
   uint16_t pc;
   Memory memory;
