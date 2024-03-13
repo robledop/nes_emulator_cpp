@@ -1,17 +1,17 @@
 #include <cassert>
 #include "PPU.h"
-bool PPU::get_ppu_latch() const {
-  return this->ppu_latch;
-}
-void PPU::set_ppu_latch(bool latch) {
-  this->ppu_latch = latch;
-}
-uint16_t PPU::get_ppu_data_addr() const {
-  return this->ppu_data_addr;
-}
-void PPU::set_ppu_data_addr(uint16_t data_addr) {
-  this->ppu_data_addr = data_addr;
-}
+//bool PPU::get_ppu_latch() const {
+//  return this->ppu_latch;
+//}
+//void PPU::set_ppu_latch(bool latch) {
+//  this->ppu_latch = latch;
+//}
+//uint16_t PPU::get_ppu_data_addr() const {
+//  return this->ppu_data_addr;
+//}
+//void PPU::set_ppu_data_addr(uint16_t data_addr) {
+//  this->ppu_data_addr = data_addr;
+//}
 void PPU::render_background(SDL_Renderer *renderer) {
   this->draw_tiles(renderer);
 }
@@ -106,14 +106,15 @@ uint16_t PPU::get_name_table() const {
 	case 2: return NAME_TABLE_2;
 	case 3: return NAME_TABLE_3;
 	default: assert(false);
+	  return 0;
   }
 }
 void PPU::draw_bg_tile(SDL_Renderer *renderer,
 					   int x,
 					   int y,
-					   uint16_t pattern_pos,
-					   uint16_t attribute_table_address,
-					   uint16_t name_table_pos) {
+					   const uint16_t pattern_pos,
+					   const uint16_t attribute_table_address,
+					   const uint16_t name_table_pos) {
 
   // https://www.nesdev.org/wiki/PPU_scrolling#Tile_and_attribute_fetching
   const uint16_t attribute_address =
@@ -125,7 +126,7 @@ void PPU::draw_bg_tile(SDL_Renderer *renderer,
   const uint8_t attribute_shift = ((name_table_pos & 0x40) >> 4) | (name_table_pos & 0x2);
   const uint8_t palette_selector = (attribute >> attribute_shift) & 0x3;
 
-  const uint16_t palette_base = this->get_background_palette(palette_selector);
+  const uint16_t palette_base = PPU::get_background_palette(palette_selector);
 
   for (uint16_t i = 0; i < 8; i++) {
 	const uint8_t tile_hi_byte = this->memory.data[pattern_pos + i];
@@ -136,55 +137,55 @@ void PPU::draw_bg_tile(SDL_Renderer *renderer,
   }
 }
 void PPU::draw_sprite_tile_row(SDL_Renderer *renderer,
-							   uint8_t tile_lo_byte,
-							   uint8_t tile_hi_byte,
-							   int x,
-							   int y,
-							   uint8_t attributes) {
-  const bool flip_horizontally = attributes & 0b01000000;
+							   const uint8_t tile_lo_byte,
+							   const uint8_t tile_hi_byte,
+							   const int x,
+							   const int y,
+							   const uint8_t attribute) {
+  const bool flip_horizontally = attribute & 0b01000000;
 
   int rx = x;
 
   if (flip_horizontally) {
 	for (int i = 7; i > -1; i--) {
-	  this->draw_sprite_row_pixel(renderer, tile_lo_byte, tile_hi_byte, y, &rx, attributes, i);
+	  this->draw_sprite_row_pixel(renderer, tile_lo_byte, tile_hi_byte, y, &rx, attribute, i);
 	}
   } else {
 	for (int i = 0; i < 8; i++) {
-	  this->draw_sprite_row_pixel(renderer, tile_lo_byte, tile_hi_byte, y, &rx, attributes, i);
+	  this->draw_sprite_row_pixel(renderer, tile_lo_byte, tile_hi_byte, y, &rx, attribute, i);
 	}
   }
 
 }
 void PPU::draw_sprite_row_pixel(SDL_Renderer *renderer,
-								uint8_t tile_lo_byte,
-								uint8_t tile_hi_byte,
-								int y,
+								const uint8_t tile_lo_byte,
+								const uint8_t tile_hi_byte,
+								const int y,
 								int *x,
-								uint16_t attribute,
-								int bit) {
+								const uint16_t attribute,
+								const int bit) {
   const bool is_lo_set = tile_lo_byte & (0b10000000 >> bit);
   const bool is_hi_set = tile_hi_byte & (0b10000000 >> bit);
 
   Uint8 red;
   Uint8 green;
   Uint8 blue;
-  const uint16_t palette_base = this->get_sprite_palette(attribute & 0b00000011);
+  const uint16_t palette_base = PPU::get_sprite_palette(attribute & 0b00000011);
 
   if (!is_hi_set && is_lo_set) // 1
   {
 	const uint16_t index = this->memory.data[palette_base + 2];
-	this->get_rgb_color(&red, &green, &blue, index);
+	PPU::get_rgb_color(&red, &green, &blue, index);
 	SDL_SetRenderDrawColor(renderer, red, green, blue, 255);
   } else if (is_hi_set && !is_lo_set) // 2
   {
 	const uint16_t index = this->memory.data[palette_base + 1];
-	this->get_rgb_color(&red, &green, &blue, index);
+	PPU::get_rgb_color(&red, &green, &blue, index);
 	SDL_SetRenderDrawColor(renderer, red, green, blue, 255);
   } else if (is_hi_set && is_lo_set) // 3
   {
 	const uint16_t index = this->memory.data[palette_base + 3];
-	this->get_rgb_color(&red, &green, &blue, index);
+	PPU::get_rgb_color(&red, &green, &blue, index);
 	SDL_SetRenderDrawColor(renderer, red, green, blue, 255);
   }
 
@@ -200,11 +201,11 @@ void PPU::draw_sprite_row_pixel(SDL_Renderer *renderer,
 
 }
 void PPU::draw_bg_tile_row(SDL_Renderer *renderer,
-						   uint8_t tile_lo_byte,
-						   uint8_t tile_hi_byte,
-						   int x,
-						   int y,
-						   uint16_t palette_base) {
+						   const uint8_t tile_lo_byte,
+						   const uint8_t tile_hi_byte,
+						   const int x,
+						   const int y,
+						   const uint16_t palette_base) {
   int rx = x;
   for (int i = 0; i < 8; i++) {
 	const bool is_lo_set = tile_lo_byte & (0b10000000 >> i);
@@ -217,22 +218,22 @@ void PPU::draw_bg_tile_row(SDL_Renderer *renderer,
 	if (!is_hi_set && !is_lo_set) // 0
 	{
 	  const uint16_t value = this->memory.data[palette_base + 0];
-	  this->get_rgb_color(&red, &green, &blue, value);
+	  PPU::get_rgb_color(&red, &green, &blue, value);
 	  SDL_SetRenderDrawColor(renderer, red, green, blue, 255);
 	} else if (!is_hi_set && is_lo_set) // 1
 	{
 	  const uint16_t value = this->memory.data[palette_base + 2];
-	  this->get_rgb_color(&red, &green, &blue, value);
+	  PPU::get_rgb_color(&red, &green, &blue, value);
 	  SDL_SetRenderDrawColor(renderer, red, green, blue, 255);
 	} else if (is_hi_set && !is_lo_set) // 2
 	{
 	  const uint16_t value = this->memory.data[palette_base + 1];
-	  this->get_rgb_color(&red, &green, &blue, value);
+	  PPU::get_rgb_color(&red, &green, &blue, value);
 	  SDL_SetRenderDrawColor(renderer, red, green, blue, 255);
 	} else if (is_hi_set && is_lo_set) // 3
 	{
 	  const uint16_t value = this->memory.data[palette_base + 3];
-	  this->get_rgb_color(&red, &green, &blue, value);
+	  PPU::get_rgb_color(&red, &green, &blue, value);
 	  SDL_SetRenderDrawColor(renderer, red, green, blue, 255);
 	}
 
@@ -246,7 +247,7 @@ void PPU::draw_bg_tile_row(SDL_Renderer *renderer,
   }
 
 }
-uint16_t PPU::get_sprite_palette(uint8_t attribute) {
+uint16_t PPU::get_sprite_palette(const uint8_t attribute) {
   switch (attribute) {
 	case 0: return 0x3F10;
 	case 1: return 0x3F14;
@@ -255,7 +256,7 @@ uint16_t PPU::get_sprite_palette(uint8_t attribute) {
 	default: assert(false);
   }
 }
-uint16_t PPU::get_background_palette(uint16_t attribute) {
+uint16_t PPU::get_background_palette(const uint16_t attribute) {
   switch (attribute) {
 	case 0: return 0x3F00;
 	case 1: return 0x3F04;
@@ -265,7 +266,7 @@ uint16_t PPU::get_background_palette(uint16_t attribute) {
   }
 }
 void PPU::get_rgb_color(uint8_t *r, uint8_t *g, uint8_t *b, uint16_t index) {
-  const uint32_t colors = ppu_colors[index];
+  const uint32_t colors = PPU::ppu_colors[index];
   *r = (colors >> 16) & 0xff;
   *g = (colors >> 8) & 0xFF;
   *b = colors & 0xFF;
@@ -279,6 +280,7 @@ void PPU::clear_memory() {
   this->ppu_latch = false;
   this->ppu_latch = false;
 }
+
 void PPU::clear_registers() {
   this->registers.oam_addr = 0x00;
   this->registers.oam_data = 0x00;

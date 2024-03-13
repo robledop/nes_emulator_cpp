@@ -331,13 +331,16 @@ void CPU::init(uint16_t prg_size) {
   this->x = 0x00;
   this->y = 0x00;
 
-  this->pc = ((uint16_t)(this->read_memory(0x8000 + prg_size - 3) << 8)) | this->read_memory(0x8000 + prg_size - 4);
+  this->pc = ((uint16_t)(this->read_memory(0x8000 + prg_size - 3) << 8)) |
+	  this->read_memory(0x8000 + prg_size - 4);
 
   this->nmi_prt =
-	  ((uint16_t)(this->read_memory(0x8000 + prg_size - 5) << 8)) | this->read_memory(0x8000 + prg_size - 6);
+	  ((uint16_t)(this->read_memory(0x8000 + prg_size - 5) << 8)) |
+		  this->read_memory(0x8000 + prg_size - 6);
 
   this->irq_prt =
-	  ((uint16_t)(this->read_memory(0x8000 + prg_size - 1) << 8)) | this->read_memory(0x8000 + prg_size - 2);
+	  ((uint16_t)(this->read_memory(0x8000 + prg_size - 1) << 8)) |
+		  this->read_memory(0x8000 + prg_size - 2);
 
   this->ppu.clear_memory();
   this->ppu.clear_registers();
@@ -396,8 +399,9 @@ void CPU::set_n_flag(const int8_t value) {
 }
 uint16_t CPU::stack_pop_16() {
   const uint16_t result =
-	  (uint16_t)(this->read_memory(STACK_BASE + (this->sp + 2)) << 8) | (uint16_t)
-		  this->read_memory(STACK_BASE + (this->sp + 1));
+	  (uint16_t)(this->read_memory(STACK_BASE + (this->sp + 2)) << 8) |
+		  (uint16_t)
+  this->read_memory(STACK_BASE + (this->sp + 1));
   this->sp += 2;
   return result;
 }
@@ -443,9 +447,9 @@ void CPU::calc_negative(uint8_t value) {
 // http://www.righto.com/2012/12/the-6502-overflow-flag-explained.html
 // Two numbers that have the same sign are added, and the result has a different sign
 void CPU::calc_overflow(uint16_t result, uint8_t operand) {
-  const int8_t a_sign = this->a & (uint8_t)0x80;
-  const int8_t operand_sign = operand & (uint8_t)0x80;
-  const int8_t result_sign = result & 0x80;
+  const uint8_t a_sign = this->a & (uint8_t)0x80;
+  const uint8_t operand_sign = operand & (uint8_t)0x80;
+  const uint8_t result_sign = result & 0x80;
 
   if ((a_sign == operand_sign) && a_sign != result_sign) {
 	this->set_v_flag(1);
@@ -501,44 +505,44 @@ uint16_t CPU::get_memory_address(AddressMode address_mode) {
 	}
 
 	case absolute: {
-	  const uint8_t low_uint8_t = this->read_memory(this->pc);
+	  const uint8_t low_byte = this->read_memory(this->pc);
 	  this->pc++;
-	  const uint8_t high_uint8_t = this->read_memory(this->pc);
+	  const uint8_t high_byte = this->read_memory(this->pc);
 	  this->pc++;
-	  return ((uint16_t)(high_uint8_t << 8)) | low_uint8_t;
+	  return ((uint16_t)(high_byte << 8)) | low_byte;
 	}
 
 	case absolute_x: {
-	  const uint8_t low_uint8_t = this->read_memory(this->pc);
+	  const uint8_t low_byte = this->read_memory(this->pc);
 	  this->pc++;
-	  const uint8_t high_uint8_t = this->read_memory(this->pc);
+	  const uint8_t high_byte = this->read_memory(this->pc);
 	  this->pc++;
-	  uint16_t address = ((uint16_t)(high_uint8_t << 8)) | low_uint8_t;
+	  uint16_t address = ((uint16_t)(high_byte << 8)) | low_byte;
 	  address += this->x;
 	  return address;
 	}
 
 	case absolute_y: {
-	  const uint8_t low_uint8_t = this->read_memory(this->pc);
+	  const uint8_t low_byte = this->read_memory(this->pc);
 	  this->pc++;
-	  const uint8_t high_uint8_t = this->read_memory(this->pc);
+	  const uint8_t high_byte = this->read_memory(this->pc);
 	  this->pc++;
-	  uint16_t address = ((uint16_t)(high_uint8_t << 8)) | low_uint8_t;
+	  uint16_t address = ((uint16_t)(high_byte << 8)) | low_byte;
 	  address += this->y;
 	  return address;
 	}
 
 	case indirect: {
-	  const uint8_t low_uint8_t = this->read_memory(this->pc);
+	  const uint8_t low_byte = this->read_memory(this->pc);
 	  this->pc++;
-	  const uint8_t high_uint8_t = this->read_memory(this->pc);
+	  const uint8_t high_byte = this->read_memory(this->pc);
 	  this->pc++;
-	  const uint16_t address = ((uint16_t)(high_uint8_t << 8)) | low_uint8_t;
+	  const uint16_t address = ((uint16_t)(high_byte << 8)) | low_byte;
 
-	  const uint8_t indirect_lo_uint8_t = this->read_memory(address);
-	  const uint8_t indirect_hi_uint8_t = this->read_memory(address + 1);
+	  const uint8_t indirect_lo_byte = this->read_memory(address);
+	  const uint8_t indirect_hi_byte = this->read_memory(address + 1);
 
-	  const uint16_t indirect_address = ((uint16_t)(indirect_hi_uint8_t << 8)) | indirect_lo_uint8_t;
+	  const uint16_t indirect_address = ((uint16_t)(indirect_hi_byte << 8)) | indirect_lo_byte;
 
 	  return indirect_address;
 	}
@@ -547,18 +551,18 @@ uint16_t CPU::get_memory_address(AddressMode address_mode) {
 
 	  const uint8_t vector = this->read_memory(this->pc);
 	  this->pc++;
-	  const uint8_t low_uint8_t = this->read_memory((vector + this->x) & 0xFF);
-	  const uint8_t high_uint8_t = this->read_memory((vector + this->x + 1) & 0xFF);
-	  return ((uint16_t)(high_uint8_t << 8)) | low_uint8_t;
+	  const uint8_t low_byte = this->read_memory((vector + this->x) & 0xFF);
+	  const uint8_t high_byte = this->read_memory((vector + this->x + 1) & 0xFF);
+	  return ((uint16_t)(high_byte << 8)) | low_byte;
 	}
 
 	case indirect_indexed: {
 	  const uint8_t vector = this->read_memory(this->pc);
 	  this->pc++;
-	  const uint8_t low_uint8_t = this->read_memory(vector);
-	  const uint8_t high_uint8_t = this->read_memory((vector + 1) & 0xFF);
+	  const uint8_t low_byte = this->read_memory(vector);
+	  const uint8_t high_byte = this->read_memory((vector + 1) & 0xFF);
 
-	  return (((uint16_t)(high_uint8_t << 8)) | low_uint8_t) + this->y;
+	  return (((uint16_t)(high_byte << 8)) | low_byte) + this->y;
 	}
   }
 
@@ -572,17 +576,17 @@ uint8_t CPU::read_memory(uint16_t address) {
 	  // Do nothing. Write-only registers
 	  return 0;
 
-	case PPU_STATUS: this->ppu.set_ppu_latch(false);
+	case PPU_STATUS: this->ppu.ppu_latch = false;
 	  return this->ppu.registers.ppu_status;
 	case OAM_ADDR: return this->ppu.registers.oam_addr;
 	case OAM_DATA: return this->ppu.registers.oam_data;
 	case PPU_ADDR: return this->ppu.registers.ppu_addr;
 	case PPU_DATA: return this->ppu.registers.ppu_data;
 	case CONTROLLER_1: return this->controller->read_next_button();
-	default: return read_memory_at_address(address);
+	default: return this->read_memory_at_address(address);
   }
 }
-void CPU::write_memory(uint16_t address, uint8_t value) {
+void CPU::write_memory(uint16_t address, const uint8_t value) {
   switch (address) {
 	case PPU_CTRL: this->ppu.registers.ppu_ctrl = value;
 	  break;
@@ -597,41 +601,41 @@ void CPU::write_memory(uint16_t address, uint8_t value) {
 	  break;
 
 	case PPU_SCROLL: {
-	  if (this->ppu.get_ppu_latch()) {
+	  if (this->ppu.ppu_latch) {
 		this->ppu.registers.ppu_scroll_y = value;
-		this->ppu.set_ppu_latch(false);
+		this->ppu.ppu_latch = false;
 	  } else {
 		this->ppu.registers.ppu_scroll_x = value;
-		this->ppu.set_ppu_latch(true);
+		this->ppu.ppu_latch = true;
 	  }
 	}
 	  break;
 
 	case PPU_ADDR: {
-	  if (this->ppu.get_ppu_latch()) {
-		this->ppu.set_ppu_data_addr(this->ppu.get_ppu_data_addr() | (uint16_t)value);
-		this->ppu.set_ppu_latch(false);
+	  if (this->ppu.ppu_latch) {
+		this->ppu.ppu_data_addr |= (uint16_t)value;
+		this->ppu.ppu_latch = false;
 	  } else {
-		this->ppu.set_ppu_data_addr((uint16_t)(value << 8));
-		this->ppu.set_ppu_latch(true);
+		this->ppu.ppu_data_addr = (uint16_t)(value << 8);
+		this->ppu.ppu_latch = true;
 	  }
-	  assert(this->ppu.get_ppu_data_addr() < VRAM_SIZE);
+	  assert(this->ppu.ppu_data_addr < VRAM_SIZE);
 	}
 	  break;
 
-	case PPU_DATA: assert(this->ppu.get_ppu_data_addr() <= VRAM_SIZE - 1);
-	  this->ppu.memory.data[this->ppu.get_ppu_data_addr()] = value;
+	case PPU_DATA: assert(this->ppu.ppu_data_addr <= VRAM_SIZE - 1);
+	  this->ppu.memory.data[this->ppu.ppu_data_addr] = value;
 	  if (this->ppu.registers.ppu_ctrl & 0b00000100) {
-		this->ppu.set_ppu_data_addr(this->ppu.get_ppu_data_addr() + 32);
+		this->ppu.ppu_data_addr += 32;
 	  } else {
-		this->ppu.set_ppu_data_addr(this->ppu.get_ppu_data_addr() + 1);
+		this->ppu.ppu_data_addr += 1;
 	  }
 	  break;
 
 	case OAM_DMA: {
 	  for (uint16_t i = 0; i < 256; ++i) {
 		const uint16_t oam_copy_address = (uint16_t)(value << 8) + i;
-		this->ppu.oam.data[i] = read_memory(oam_copy_address);
+		this->ppu.oam.data[i] = this->read_memory(oam_copy_address);
 	  }
 	}
 	  break;
@@ -664,7 +668,7 @@ void CPU::ldx(AddressMode address_mode) {
 }
 void CPU::ldy(AddressMode address_mode) {
   const uint16_t address = this->get_memory_address(address_mode);
-  this->y = read_memory(address);
+  this->y = this->read_memory(address);
   this->calc_zero(this->y);
   this->calc_negative(this->y);
 #ifdef LOGGING
@@ -772,7 +776,7 @@ void CPU::bmi() {
 }
 void CPU::bne() {
   if (!this->get_z_flag()) {
-	const uint16_t address = get_memory_address(AddressMode::relative);
+	const uint16_t address = this->get_memory_address(AddressMode::relative);
 	this->pc += (char)address;
   } else {
 	this->pc++;
@@ -784,7 +788,7 @@ void CPU::bne() {
 }
 void CPU::bpl() {
   if (!this->get_n_flag()) {
-	const uint16_t address = get_memory_address(AddressMode::relative);
+	const uint16_t address = this->get_memory_address(AddressMode::relative);
 	this->pc += (char)address;
 #ifdef LOGGING
 	printf("BPL %x\n", address);
@@ -833,30 +837,29 @@ void CPU::bvs() {
 #ifdef LOGGING
   printf("BVS %x\n", this->pc);
 #endif
-
 }
 
 void CPU::clc() {
-  this->set_c_flag(AddressMode::implicit);
+  this->set_c_flag(0);
 #ifdef LOGGING
   printf("CLC\n");
 #endif
 }
 
 void CPU::cld() {
-  this->set_d_flag(AddressMode::implicit);
+  this->set_d_flag(0);
 #ifdef LOGGING
   printf("CLD\n");
 #endif
 }
 void CPU::cli() {
-  this->set_i_flag(AddressMode::implicit);
+  this->set_i_flag(0);
 #ifdef LOGGING
   printf("CLI\n");
 #endif
 }
 void CPU::clv() {
-  this->set_v_flag(AddressMode::implicit);
+  this->set_v_flag(0);
 #ifdef LOGGING
   printf("CLV\n");
 #endif
@@ -864,7 +867,7 @@ void CPU::clv() {
 void CPU::cmp(AddressMode address_mode) {
   const uint16_t address = this->get_memory_address(address_mode);
   const uint8_t mem = this->read_memory(address);
-  const uint8_t result = this->a - mem;
+  const int result = this->a - mem;
 
   this->set_c_flag(result >= 0 ? 1 : 0);
   this->calc_negative((uint8_t)result);
@@ -879,7 +882,7 @@ void CPU::cpx(AddressMode address_mode) {
   const uint16_t address = this->get_memory_address(address_mode);
   const uint8_t mem = this->read_memory(address);
 
-  const int result = this->x - (int)mem;
+  const int result = this->x - mem;
 
   this->set_c_flag(result >= 0 ? 1 : 0);
   this->calc_negative((uint8_t)result);
@@ -893,7 +896,7 @@ void CPU::cpy(AddressMode address_mode) {
   const uint16_t address = this->get_memory_address(address_mode);
   const uint8_t mem = this->read_memory(address);
 
-  const int result = this->y - (int)mem;
+  const int result = this->y - mem;
 
   this->set_c_flag(result >= 0 ? 1 : 0);
   this->calc_negative((uint8_t)result);
@@ -1193,6 +1196,7 @@ void CPU::sta(AddressMode address_mode) {
 #endif
   write_memory(address, this->a);
 }
+
 void CPU::stx(AddressMode address_mode) {
   const uint16_t address = this->get_memory_address(address_mode);
   this->write_memory(address, this->x);
@@ -1243,11 +1247,10 @@ void CPU::tsx() {
 }
 void CPU::txa() {
   this->a = this->x;
-  calc_zero(this->a);
-  calc_negative(this->a);
+  this->calc_zero(this->a);
+  this->calc_negative(this->a);
 
 #ifdef LOGGING
-
   puts("TXA");
 #endif
 
@@ -1256,15 +1259,14 @@ void CPU::txs() {
   this->sp = this->x;
 
 #ifdef LOGGING
-
   puts("TXS");
 #endif
 
 }
 void CPU::tya() {
   this->a = this->y;
-  calc_zero(this->a);
-  calc_negative(this->a);
+  this->calc_zero(this->a);
+  this->calc_negative(this->a);
 
 #ifdef LOGGING
   puts("TYA");

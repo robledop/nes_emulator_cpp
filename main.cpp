@@ -112,7 +112,6 @@ int main(const int argc, char** argv)
 
 	print_header_info(rom, &prg_size, &chr_size);
 
-
 	memcpy(&nes.cpu.memory.data[0x8000], &rom[0x10], prg_size);
 
 	if (prg_size == 0x4000)

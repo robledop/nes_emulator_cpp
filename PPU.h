@@ -63,8 +63,6 @@ struct Registers {
 
 class PPU {
 
-  bool ppu_latch;
-  uint16_t ppu_data_addr;
   void draw_sprites(SDL_Renderer *renderer);
   void draw_sprite_tile(SDL_Renderer *renderer, uint16_t x, uint16_t y, uint16_t tile_index, uint8_t attributes);
   void draw_tiles(SDL_Renderer *renderer);
@@ -81,7 +79,7 @@ class PPU {
 							uint8_t tile_hi_byte,
 							int x,
 							int y,
-							uint8_t attributes);
+							uint8_t attribute);
   void draw_sprite_row_pixel(SDL_Renderer *renderer,
 							 uint8_t tile_lo_byte,
 							 uint8_t tile_hi_byte,
@@ -95,19 +93,21 @@ class PPU {
 						int x,
 						int y,
 						uint16_t palette_base);
-  uint16_t  get_sprite_palette(uint8_t attribute);
-  uint16_t get_background_palette(uint16_t attribute);
-  void  get_rgb_color(uint8_t *r, uint8_t *g, uint8_t *b, uint16_t color);
+  static uint16_t  get_sprite_palette(uint8_t attribute);
+  static uint16_t get_background_palette(uint16_t attribute);
+  static void  get_rgb_color(uint8_t *r, uint8_t *g, uint8_t *b, uint16_t color);
 
  public:
   VRAM memory;
   OAM oam;
   Registers registers;
+  bool ppu_latch;
+  uint16_t ppu_data_addr;
   
-  [[nodiscard]] bool get_ppu_latch() const;
-  void set_ppu_latch(bool ppu_latch);
-  [[nodiscard]] uint16_t get_ppu_data_addr() const;
-  void set_ppu_data_addr(uint16_t ppu_data_addr);
+//  [[nodiscard]] bool get_ppu_latch() const;
+//  void set_ppu_latch(bool ppu_latch);
+//  [[nodiscard]] uint16_t get_ppu_data_addr() const;
+//  void set_ppu_data_addr(uint16_t ppu_data_addr);
 
   void render_background(SDL_Renderer *renderer);
   void render_sprites(SDL_Renderer *renderer);

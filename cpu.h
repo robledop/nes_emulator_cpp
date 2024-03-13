@@ -36,7 +36,7 @@
 
 #define EMULATOR_WINDOW_TITLE "NES Emulator"
 
-#define LOGGING
+//#define LOGGING
 
 enum AddressMode {
   implicit,
