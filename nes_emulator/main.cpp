@@ -90,15 +90,13 @@ int load_file(char **text, const char *filename, uint32_t *size_out) {
   return 1;
 }
 
-int main(const int argc, char** argv)
-{
+int main([[maybe_unused]] const int argc, char** argv) {
 	char* rom = nullptr;
 	uint32_t size = 0;
 
 	const int result = load_file(&rom, argv[1], &size);
 
-	if (result != 0 || rom == nullptr)
-	{
+	if (result != 0 || rom == nullptr) {
 		puts("There was an error while trying to load the ROM file.");
 		free(rom);
 		return result;
@@ -114,8 +112,7 @@ int main(const int argc, char** argv)
 
 	memcpy(&nes.cpu.memory.data[0x8000], &rom[0x10], prg_size);
 
-	if (prg_size == 0x4000)
-	{
+	if (prg_size == 0x4000) {
 		memcpy(&nes.cpu.memory.data[0xC000], &rom[0x10], prg_size);
 	}
 
@@ -137,13 +134,10 @@ int main(const int argc, char** argv)
 
 	int x = 0;
 
-	while (true)
-	{
+	while (true) {
 		SDL_Event event;
-		while (SDL_PollEvent(&event))
-		{
-			if (event.type == SDL_QUIT)
-			{
+		while (SDL_PollEvent(&event)) {
+			if (event.type == SDL_QUIT) {
 				goto out;
 			}
 			nes.controller.handle_input(&event);
@@ -151,22 +145,18 @@ int main(const int argc, char** argv)
 
 		nes.cpu.exec(nes.cpu.memory.data[nes.cpu.pc++]);
 
-		if (x == 4000)
-		{
+		if (x == 4000) {
 			nes.cpu.ppu.render_background(renderer);
 			nes.cpu.ppu.render_sprites(renderer);
 		}
 
-		if (x >= 1200)
-		{
+		if (x >= 1200) {
 			nes.cpu.ppu.registers.ppu_status ^= (0 ^ nes.cpu.ppu.registers.ppu_status) & 0b10000000;
 		}
 
-		if (x == 4001)
-		{
+		if (x == 4001) {
 			nes.cpu.ppu.registers.ppu_status |= 0b10000000;
-			if (nes.cpu.ppu.registers.ppu_ctrl & 0b10000000)
-			{
+			if (nes.cpu.ppu.registers.ppu_ctrl & 0b10000000) {
 				nes.cpu.call_nmi();
 			}
 			x = 0;
