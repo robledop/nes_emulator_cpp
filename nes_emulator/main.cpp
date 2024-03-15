@@ -116,7 +116,6 @@ int main([[maybe_unused]] const int argc, char** argv) {
 		memcpy(&nes.cpu.memory.data[0xC000], &rom[0x10], prg_size);
 	}
 
-	nes.cpu.controller = &nes.controller;
 
 	nes.cpu.init(prg_size);
 	memcpy(nes.cpu.ppu.memory.data, &rom[prg_size + 0x10], chr_size);
@@ -140,7 +139,7 @@ int main([[maybe_unused]] const int argc, char** argv) {
 			if (event.type == SDL_QUIT) {
 				goto out;
 			}
-			nes.controller.handle_input(&event);
+			nes.cpu.controller->handle_input(&event);
 		}
 
 		nes.cpu.exec(nes.cpu.memory.data[nes.cpu.pc++]);

@@ -128,17 +128,23 @@ class CPU {
   void bcs();
 
  public:
-  uint16_t nmi_prt;
-  uint16_t irq_prt;
+  CPU(){
+	controller = new Controller();
+  }
+  ~CPU(){
+	delete controller;
+  }
+  uint16_t nmi_prt{};
+  uint16_t irq_prt{};
 
   // Accumulator
-  uint8_t a;
+  uint8_t a{};
 
   // Index register
-  uint8_t x, y;
+  uint8_t x{}, y{};
 
   // Stack pointer
-  uint8_t sp;
+  uint8_t sp{};
 
   // Processor status
   // N, V, 1, B, D, I, Z, C
@@ -150,11 +156,11 @@ class CPU {
   // I = IRQB disable
   // Z = Zero
   // C = Carry
-  uint8_t p;
+  uint8_t p{};
   // Program counter
-  uint16_t pc;
-  Memory memory;
-  PPU ppu;
+  uint16_t pc{};
+  Memory memory{};
+  PPU ppu{};
   Controller *controller;
   void exec(uint8_t opcode);
   void init(uint16_t prg_size);

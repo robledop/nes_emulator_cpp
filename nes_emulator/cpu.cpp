@@ -324,6 +324,7 @@ void CPU::exec(uint8_t opcode) {
 	  printf("Unsupported opcode:%x\nPC:%x\n", opcode, this->pc);
   }
 }
+
 void CPU::init(uint16_t prg_size) {
   this->sp = 0xFF;
   this->p = 0b00100000;
@@ -551,6 +552,7 @@ uint16_t CPU::get_memory_address(AddressMode address_mode) {
 
 	  const uint8_t vector = this->read_memory(this->pc);
 	  this->pc++;
+	  // AND it with 0xFF to wrap around if it goes over 0xFF
 	  const uint8_t low_byte = this->read_memory((vector + this->x) & 0xFF);
 	  const uint8_t high_byte = this->read_memory((vector + this->x + 1) & 0xFF);
 	  return ((uint16_t)(high_byte << 8)) | low_byte;

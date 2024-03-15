@@ -5,8 +5,7 @@
 
 class NES {
  public:
-  CPU cpu;
-  Controller controller;
+  CPU cpu{};
 };
 
 #endif //NES_EMULATOR_CPP_NES_H_
